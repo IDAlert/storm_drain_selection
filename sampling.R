@@ -1,41 +1,39 @@
 # Overview ####
 
-# This script generates a simple random # sample of the Barcelona storm drains 
-# that were detected as active in 2022, # with the constraint that no sampled 
+# This script generates a simple random 
+# sample of the Barcelona storm drains 
+# that were detected as active in 2022, 
+# with the constraint that no sampled 
 # drains can be less than 200 meters 
 # from each other.
 
 # The script is written so that it can
-# be run directly by the Barcelona
-# Public Health Agency, which will
-# select a random seed and then keep
-# this and the sampled drain locations 
-# confidential until the end of the 
-# study, apart from sharing the 
-# locations with other city authorities
-# and contractors responsible for the 
-# drain modifications involved in this 
-# study.
+# be run by one member of the research team,
+# who will draw a random seed number used to
+# select the drains, and keep this number, 
+# along with the results, confidential until 
+# the end of the study, apart from sharing 
+# with the city authorities and contractors 
+# responsible for the treatment drain 
+# modifications.
 
-# This is part of IDAlert Task 5.2. More # information is in the README.md file 
+# This is part of IDAlert Task 5.2. More 
+# information is in the README.md file 
 # of this repository and at 
 # http://idalertproject.eu
-
-# Copyright 2023 IDAlert Consortium
 
 rm(list=ls())
 
 # setting seed for RNG ####
 
-set.seed(1234) # Make sure to change this and keep your number stored but confidential. (You could simply save it in your local version of the script.)
+this_seed = sample(1:10000, 1) # this number will be stored at the end.
+set.seed(this_seed) # for reproducing the sample, this_seed should be set manually to the stored seed.
 
 # setting directories ####
 
-data_directory = "data/raw/ASPB/items_act_2022_vs_modificats" # change this to the path of the directory in which you have the storm drain shape file (items_act_2022.shp).
+data_directory = "data/raw/ASPB/items_act_2022_vs_modificats" # directory with the storm drain shape file (items_act_2022.shp).
 
-output_directory = "output" # change this to the path of the directory in which you want the two output files to be saved.
-
-#### DO NOT CHANGE ANYTHING BELOW THIS POINT ####
+output_directory = "output/IDAlert_storm_drain_sample_2023" # directory in which the two output files will be saved.
 
 # Dependencies ####
 library(tidyverse)
@@ -92,6 +90,9 @@ this_sample %>% st_write(file.path(output_directory, "storm_drains_selected.shp"
 
 this_sample %>% select(-treatment) %>% st_write(file.path(output_directory, "storm_drains_selected_masked.shp"))
 
+sink(file.path(output_directory, "storm_drains_seed.txt"))
+cat(this_seed)
+sink()
 
 
 
