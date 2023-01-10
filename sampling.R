@@ -4,7 +4,7 @@
 # sample of the Barcelona storm drains 
 # that were detected as active in 2022, 
 # with the constraint that no sampled 
-# drains can be less than 200 meters 
+# drains can be 200 meters or less 
 # from each other.
 
 # The script is written so that it can
@@ -44,30 +44,29 @@ library(units)
 
 buffered_sample = function(data, sample_size, buffer_radius_m){
   
-  min_distance = set_units(buffer_radius_m, m)
+  min_distance = set_units(buffer_radius_m, m) # turn the integer value of the minimum distance into a units object in meters.
 
-  D = data 
-  this_sample  = NULL
-  is_treatment = TRUE
-  groups = sample(c("A", "B"))
+  D = data # create a new sf object that will be manipulated as samples are selected.
+  this_sample  = NULL # creating a null object that will be used to store the final sample. This will be turned into an sf object as data is added to it.
+  is_treatment = TRUE # treatment dummy that will switch back and forth
+  groups = sample(c("A", "B")) # groups vector that is set in random order, to be assigned at the end such that we can have a masked version of the final selection that uses "A" and "B" groups without indicating which is treatment.
   
   for(i in 1:sample_size){
-    this_draw = D %>% sample_n(1) %>% mutate(treatment = is_treatment)
-    D = D[st_distance(D, this_draw) > min_distance,]
-    this_sample = bind_rows(this_sample, this_draw)
-    is_treatment = !is_treatment
-    if(nrow(D)==0) break
+    this_draw = D %>% sample_n(1) %>% mutate(treatment = is_treatment) # select one drain at random from the initial pool
+    D = D[st_distance(D, this_draw) > min_distance,] # Remove this drain from the pool and also remove any other drains less than or equal to the minimal distance
+    this_sample = bind_rows(this_sample, this_draw) # add the selected drain to the sf object in which the final sample is being stored
+    is_treatment = !is_treatment # flip the treatment dummy
+    if(nrow(D)==0) break # stop here if we no longer have any drains left in the pool
   }
   
-  # in case the final result has an odd number of rows, remove the last one.
-  final_sample_size = nrow(this_sample)
+  final_sample_size = nrow(this_sample) # check final sample size at the end of the loop
   if(final_sample_size %% 2 != 0){
     this_sample = this_sample[ -final_sample_size,]
-  }
+  } # in case the final result has an odd number of rows, remove the last one.
   
-  this_sample = this_sample %>% mutate(group = if_else(treatment, groups[1], groups[2]))
+  this_sample = this_sample %>% mutate(group = if_else(treatment, groups[1], groups[2])) # assign the group label vector to the final result
     
-  return(this_sample)
+  return(this_sample) # return the final result
 }
 
 
@@ -86,13 +85,15 @@ target_sample_size = 80 # this is sample size we would like but we will not actu
 this_sample = buffered_sample(data = active_embornals_2022, sample_size = target_sample_size, buffer_radius_m = minimal_distance) 
 
 
-this_sample %>% st_write(file.path(output_directory, "storm_drains_selected.shp"))
+this_sample %>% st_write(file.path(output_directory, "storm_drains_selected.shp")) # writing the final selected drains to the output directory as a shape file.
 
-this_sample %>% select(-treatment) %>% st_write(file.path(output_directory, "storm_drains_selected_masked.shp"))
+this_sample %>% select(-treatment) %>% st_write(file.path(output_directory, "storm_drains_selected_masked.shp")) # writing the masked final selected drains to the output directory as a shape file.
 
 sink(file.path(output_directory, "storm_drains_seed.txt"))
 cat(this_seed)
-sink()
+sink() # writing the random seed to the output directory as a text file.
+
+# After running this script, the output directory was compressed as an encrypted zip file and sent to ASPB. 
 
 
 
