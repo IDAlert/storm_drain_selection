@@ -3,17 +3,11 @@ Code for selecting a sample of storm drains in Barcelona for the IDAlert interve
 
 ## Usage
 
-The code in `sampling.R` generates a simple random sample of the Barcelona storm drains that were detected as active in 2022, with the constraint that no sampled drains can be less than 200 meters from each other.
+The code in `sampling.R` generates a simple random sample of the Barcelona storm drains that were detected as active in 2022, with the constraint that no sampled drains can be less than 200 meters from each other and the final sample must have an even number of drains.
 
-The script is written so that it can be run directly by the Barcelona Public Health Agency, which will select a random seed and then keep this and the sampled drain locations confidential until the end of the study, apart from sharing the locations with other city authorities and contractors responsible for the drain modifications involved in this study.
+The script is written so that it can be run by one member of the research team and shared with city authorities and contractors responsible for the drain modifications, keeping others on the research team blind to the locations of the treatment and control drains until the end of the study.
 
-To use the script, you should to do the following:
-
-1. Clone the repository or simply download `sampling.R`.
-2. Fill in a random seed value, save your local copy of the script and keep it someplace safe and confidential, so that the seed you used can be later shared for replicability purposes but is not known by other researchers until the sampling and analysis have been completed. 
-3. Fill in the path to the directory in which you have the shape file containing the active storm drains from which the selection is being made (`items_act_2022.shp`).
-4. Fill in the path to the directory in which you would like the output saved.
-5. Run the code. It will save two sets of shape files in the output directory: (a) `storm_drains_selected.shp` (and associated files with the same name) is the file that contains the information on selected drains, and whether each of these is in the treatment or control group; (b) `storm_drains_selected_masked.shp` (and associated files with the same name) is the same file, but it is missing the `treatment` variable. Each of these files has a `group` variable in which the treatment and control groups have been randomly assigned either `A` of `B`. Thus, `storm_drains_selected_masked.csv` will be the file that should be shared with the data analysis team after sampling has been completed, so that analysis can be done without knowing which is the treatment group and which is the control group.
+The code uses a randomly generated seed value to select a simple random sample of storm drains according to the constraints described above. It saves the seed value and two sets of shape files: (a) `storm_drains_selected.shp` (and associated files with the same name) is the file that contains the information on selected drains, and whether each of these is in the treatment or control group; (b) `storm_drains_selected_masked.shp` (and associated files with the same name) is the same file, but it is missing the `treatment` variable. Each of these files has a `group` variable in which the treatment and control groups have been randomly assigned either `A` of `B`. Thus, `storm_drains_selected_masked.shp` should be the file shared with the data analysis team after sampling has been completed, so that analysis can be done without knowing which is the treatment group and which is the control group.
 
 ## About
 
