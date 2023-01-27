@@ -33,7 +33,7 @@ set.seed(this_seed) # for reproducing the sample, this_seed should be set manual
 
 data_directory = "data/raw/ASPB/items_act_2022_vs_modificats_bcasa_only_2023_01_27" # new directory with the storm drain shape file sent to JP by AV (ASPB) on 27 January, with minor cleaning to remove extranrous field (items_act_2022_bcasa.shp).
 
-output_directory = "output/IDAlert_storm_drain_sample_2023" # directory in which the two output files will be saved.
+output_directory = "output/IDAlert_storm_drain_sample_2023_01_27" # directory in which the two output files will be saved.
 
 # Dependencies ####
 library(tidyverse)
