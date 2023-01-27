@@ -31,7 +31,7 @@ set.seed(this_seed) # for reproducing the sample, this_seed should be set manual
 
 # setting directories ####
 
-data_directory = "data/raw/ASPB/items_act_2022_vs_modificats" # directory with the storm drain shape file (items_act_2022.shp).
+data_directory = "data/raw/ASPB/items_act_2022_vs_modificats_bcasa_only_2023_01_27" # new directory with the storm drain shape file sent to JP by AV (ASPB) on 27 January, with minor cleaning to remove extranrous field (items_act_2022_bcasa.shp).
 
 output_directory = "output/IDAlert_storm_drain_sample_2023" # directory in which the two output files will be saved.
 
@@ -73,8 +73,8 @@ buffered_sample = function(data, sample_size, buffer_radius_m){
 # Configuration  ####
 
 # active storm drains
-active_embornals_2022 = read_sf(file.path(data_directory, "items_act_2022.shp")) %>% # This file shows drains in which albopictus activity was detected in 2022. 
-  filter(tipus_enti == "Embornal") # We are filtering it to select only the "embornals", which are the the typical storm drains, and thus avoid additional variation from Reixas and Canals. There are 141 active embornals in the dataset.
+active_embornals_2022 = read_sf(file.path(data_directory, "items_act_2022_bcasa.shp")) %>% # This file shows drains in which albopictus activity was detected in 2022. 
+  filter(tipus_enti == "Embornal") # We are filtering it to select only the "embornals", which are the the typical storm drains, and thus avoid additional variation from Reixas and Canals. There are 135 active embornals in the dataset.
 
 # using sampling function ####
 
