@@ -31,9 +31,9 @@ set.seed(this_seed) # for reproducing the sample, this_seed should be set manual
 
 # setting directories ####
 
-data_directory = "data/raw/ASPB/items_act_2022_vs_modificats_bcasa_only_2023_01_27" # new directory with the storm drain shape file sent to JP by AV (ASPB) on 27 January, with minor cleaning to remove extranrous field (items_act_2022_bcasa.shp).
+data_directory = "data/raw/ASPB/items_act_2022_vs_modificats_bcasa_only_2023_01_27" # new directory with the storm drain shape file sent to JP by AV (ASPB) on 27 January, with minor cleaning to remove extraneous field (items_act_2022_embornal_reixa_bcasa.shp).
 
-output_directory = "output/IDAlert_storm_drain_sample_2023_01_27" # directory in which the two output files will be saved.
+output_directory = "output/IDAlert_storm_drain_sample_2023_01_31" # directory in which the two output files will be saved.
 
 # Dependencies ####
 library(tidyverse)
@@ -42,12 +42,20 @@ library(units)
 
 # sampling function ####
 
-buffered_sample = function(data, sample_size, buffer_radius_m){
+buffered_sample = function(data, sample_size, buffer_radius_m, existing_sample = NULL){
   
   min_distance = set_units(buffer_radius_m, m) # turn the integer value of the minimum distance into a units object in meters.
 
   D = data # create a new sf object that will be manipulated as samples are selected.
-  this_sample  = NULL # creating a null object that will be used to store the final sample. This will be turned into an sf object as data is added to it.
+  
+  if(is.null(existing_sample)){
+  this_sample  = NULL # if no existing sample is passed as an argument then we simply create a null object that will be used to store the final sample. This will be turned into an sf object as data is added to it.
+  } else{
+    this_sample = existing_sample # if an existing sample is passed, then we will start with this, and filter the remaining draints to remove any within the minimum distance.
+    D = D[ apply(st_distance(D, this_sample) < min_distance, 1, sum) == 0, ] # Remove this drain from the pool and also remove any other drains less than or equal to the minimal distance
+    
+  }
+  
   is_treatment = TRUE # treatment dummy that will switch back and forth
   groups = sample(c("A", "B")) # groups vector that is set in random order, to be assigned at the end such that we can have a masked version of the final selection that uses "A" and "B" groups without indicating which is treatment.
   
@@ -73,8 +81,10 @@ buffered_sample = function(data, sample_size, buffer_radius_m){
 # Configuration  ####
 
 # active storm drains
-active_embornals_2022 = read_sf(file.path(data_directory, "items_act_2022_bcasa.shp")) %>% # This file shows drains in which albopictus activity was detected in 2022. 
-  filter(tipus_enti == "Embornal") # We are filtering it to select only the "embornals", which are the the typical storm drains, and thus avoid additional variation from Reixas and Canals. There are 135 active embornals in the dataset.
+active_embornals_2022 = read_sf(file.path(data_directory, "items_act_2022_embornal_reixa_bcasa.shp")) # This file shows drains in which albopictus activity was detected in 2022. 
+
+embornals = active_embornals_2022 %>% filter(tipus_enti == "Embornal")
+reixas = active_embornals_2022 %>% filter(tipus_enti == "Reixa")
 
 # using sampling function ####
 
@@ -82,8 +92,12 @@ minimal_distance = 200 # we want sampled drains to be at least 200 m from each o
 
 target_sample_size = 80 # this is sample size we would like but we will not actually be able to come close to it given the constraint that drains must be at least 200 m from one another.
 
-this_sample = buffered_sample(data = active_embornals_2022, sample_size = target_sample_size, buffer_radius_m = minimal_distance) 
+this_sample_embornals = buffered_sample(data = embornals, sample_size = target_sample_size, buffer_radius_m = minimal_distance) 
 
+this_sample = buffered_sample(data = reixas, sample_size = target_sample_size, buffer_radius_m = minimal_distance, existing_sample = this_sample_embornals) 
+
+# double checking that we have a sample with the same number of treatment and control embornals and reixas
+table(this_sample$treatment, this_sample$tipus_enti)
 
 this_sample %>% st_write(file.path(output_directory, "storm_drains_selected.shp")) # writing the final selected drains to the output directory as a shape file.
 
