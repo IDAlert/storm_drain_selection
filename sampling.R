@@ -31,9 +31,9 @@ set.seed(this_seed) # for reproducing the sample, this_seed should be set manual
 
 # setting directories ####
 
-data_directory = "data/raw/ASPB/items_act_2022_vs_modificats_bcasa_only_2023_01_27" # new directory with the storm drain shape file sent to JP by AV (ASPB) on 27 January, with minor cleaning to remove extraneous field (items_act_2022_embornal_reixa_bcasa.shp).
+data_directory = "data/raw/ASPB/available_drains_2023_04_21/" # new directory with the storm drain shape file sent to JP by AV (ASPB) on 20 April.
 
-output_directory = "output/IDAlert_storm_drain_sample_2023_01_31" # directory in which the two output files will be saved.
+output_directory = "output/IDAlert_storm_drain_sample_2023_04_21" # directory in which the two output files will be saved.
 
 # Dependencies ####
 library(tidyverse)
@@ -81,7 +81,7 @@ buffered_sample = function(data, sample_size, buffer_radius_m, existing_sample =
 # Configuration  ####
 
 # active storm drains
-active_embornals_2022 = read_sf(file.path(data_directory, "items_act_2022_embornal_reixa_bcasa.shp")) # This file shows drains in which albopictus activity was detected in 2022. 
+active_embornals_2022 = read_sf(file.path(data_directory, "items_sorrencs_bcasa_amb_act.shp")) # This file shows drains in which albopictus activity was detected in 2022. 
 
 embornals = active_embornals_2022 %>% filter(tipus_enti == "Embornal")
 reixas = active_embornals_2022 %>% filter(tipus_enti == "Reixa")
