@@ -5,6 +5,8 @@ Code for selecting a sample of storm drains in Barcelona for the IDAlert interve
 
 The code in `sampling.R` generates a simple random sample of the Barcelona storm drains that were detected as active in 2022, with the constraint that no sampled drains can be 200 meters or less from each other and the final sample must have an even number of drains (so that half can be assigned to the control group and half to the treatment group).
 
+The code in `sampling_2023.R` expands the sampling to draw also from the set of drains in which standing water was detected during the first months of 2023, while continuing to maintain the 200 meter distance constraint.
+
 We have written the `buffered_sample` function for selecting drains, which works as follows:
 
 1. Start with the pool of drains from which we can select the sample. This is defined as all drains in which mosquito activity was detected in 2022. 
